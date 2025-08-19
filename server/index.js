@@ -1,13 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const Database = require('./utils/database');
+const ordersRouter = require('./routes/orders');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-
-// initialize database
-const db = new Database(process.env.DB_PATH);
 
 app.use(cors());
 app.use(express.json());
@@ -18,22 +15,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// initialize database connection
-async function initializeServer() {
-  try {
-    await db.connect();
-    await db.initialize();
-    console.log('Database initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize database:', error);
-    process.exit(1);
-  }
-}
+
+// use routes
+app.use('/api', ordersRouter);
 
 // start server
-async function startServer() {
-  await initializeServer();
-  
+function startServer() {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
@@ -43,4 +30,4 @@ if (require.main === module) {
   startServer();
 }
 
-module.exports = { app, db };
+module.exports = { app };

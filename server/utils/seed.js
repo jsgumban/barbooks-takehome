@@ -1,13 +1,7 @@
-const Database = require('./database');
-require('dotenv').config();
+const db = require('../config/database');
 
 async function seedDatabase() {
-  const db = new Database(process.env.DB_PATH || './data.db');
-  
   try {
-    await db.connect();
-    await db.initialize();
-
     // Sample orders for testing
     const sampleOrders = [
       { product: 'Laptop', qty: 2, price: 1200.00 },
@@ -20,32 +14,30 @@ async function seedDatabase() {
       { product: 'Desk Pad', qty: 4, price: 24.95 }
     ];
 
-    // Clear existing data
-    await new Promise((resolve, reject) => {
-      db.db.run('DELETE FROM orders', (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
+    // Create table if it doesn't exist
+    await db.schema.createTable('orders', (table) => {
+      table.increments('id').primary();
+      table.string('product').notNullable();
+      table.integer('qty').notNullable();
+      table.decimal('price', 10, 2).notNullable();
+    }).then(() => {
+      console.log('Orders table created/verified');
+    }).catch((err) => {
+      if (!err.message.includes('already exists')) {
+        throw err;
+      }
     });
 
-    // Insert sample orders
-    const insertSQL = 'INSERT INTO orders (product, qty, price) VALUES (?, ?, ?)';
-    
-    for (const order of sampleOrders) {
-      await new Promise((resolve, reject) => {
-        db.db.run(insertSQL, [order.product, order.qty, order.price], (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-    }
+    // Clear existing data and insert new
+    await db('orders').del();
+    await db('orders').insert(sampleOrders);
 
     console.log(`Successfully seeded database with ${sampleOrders.length} orders`);
     
   } catch (error) {
     console.error('Error seeding database:', error);
   } finally {
-    await db.close();
+    await db.destroy();
   }
 }
 

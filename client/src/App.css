@@ -1,0 +1,32 @@
+/* Minimal custom styles - Bootstrap handles most styling */
+
+.App {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Custom card hover effects */
+.card {
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Summary cards styling */
+.card h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+/* Form validation feedback styling */
+.form-control:invalid {
+  border-color: #dc3545;
+}
+
+/* Loading spinner alignment */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}

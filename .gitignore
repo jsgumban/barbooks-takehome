@@ -1,0 +1,10 @@
+node_modules/
+*.log
+.env
+data.db
+dist/
+build/
+.DS_Store
+
+*.idea/
+*.pdf

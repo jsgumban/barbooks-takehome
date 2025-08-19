@@ -36,11 +36,17 @@ router.get('/orders', async (req, res) => {
   try {
     const { product, limit, offset } = req.query;
     
-    let query = db('orders').orderBy('id', 'desc');
+    let baseQuery = db('orders');
     
     if (product) {
-      query = query.where('product', 'like', `%${product}%`);
+      baseQuery = baseQuery.where('product', 'like', `%${product}%`);
     }
+    
+    // get total count for pagination
+    const totalCount = await baseQuery.clone().count('* as count').first();
+    const total = totalCount.count;
+    
+    let query = baseQuery.orderBy('id', 'desc');
     
     if (limit) {
       query = query.limit(parseInt(limit));
@@ -50,7 +56,13 @@ router.get('/orders', async (req, res) => {
     }
     
     const orders = await query;
-    res.json(orders);
+    
+    // return both orders and total count for pagination
+    if (limit) {
+      res.json({ orders, total });
+    } else {
+      res.json(orders);
+    }
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).json({ error: 'Internal server error' });

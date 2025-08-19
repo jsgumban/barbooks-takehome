@@ -8,7 +8,17 @@ import './App.css';
 
 function App() {
   const { data: summary, loading: summaryLoading, error: summaryError, refetch: refetchSummary } = useSummary();
-  const { orders, loading: ordersLoading, error: ordersError, refetch: refetchOrders } = useOrders();
+  const { 
+    orders, 
+    loading: ordersLoading, 
+    error: ordersError, 
+    currentPage,
+    totalPages,
+    productFilter,
+    refetch: refetchOrders,
+    onPageChange,
+    onFilterChange
+  } = useOrders();
 
   const handleOrderAdded = async () => {
     // refresh both summary and orders when a new order is added
@@ -39,7 +49,12 @@ function App() {
             <OrdersList 
               orders={orders} 
               loading={ordersLoading} 
-              error={ordersError} 
+              error={ordersError}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              productFilter={productFilter}
+              onPageChange={onPageChange}
+              onFilterChange={onFilterChange}
             />
           </div>
         </div>
